@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Pasitikėjimo forma - SafeStack</title>
   <link rel="stylesheet" href="../style.css"/>
+  <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 </head>
 <body>
   <h1>✅ Pasitikėjimo Validacijos Forma</h1>
@@ -15,13 +16,14 @@
     <label for="klausimai">Klausimas arba pastaba dėl pasitikėjimo:</label><br>
     <textarea id="klausimai" name="klausimai" rows="6" style="width:100%"></textarea><br><br>
 
+    <div class="g-recaptcha" data-sitekey="6Lcm25krAAAAAHvCFamz2o6SH-7yGXVIw16td_Wo"></div><br>
     <input type="submit" value="Siųsti" style="padding: 0.5rem 1rem;">
   </form>
 
   <p id="confirmation" style="display:none; margin-top: 1rem; color:lightgreen;">✅ Žinutė išsiųsta į SafeStack Telegram.</p>
 
   <footer>
-    <p><small>Ši forma siunčia žinutę į <a href="https://t.me/Safe_Stack" target="_blank">@Safe_Stack</a> Telegram kanalą.</small></p>
+    <p><small>Forma saugoma reCAPTCHA ir siunčia į <a href="https://t.me/Safe_Stack" target="_blank">@Safe_Stack</a> Telegram kanalą.</small></p>
   </footer>
 
   <script>
@@ -30,16 +32,24 @@
 
     document.getElementById("trustForm").addEventListener("submit", async function(e) {
       e.preventDefault();
+
+      const response = grecaptcha.getResponse();
+      if (!response) {
+        alert("❗ Prašome patvirtinti, kad nesate robotas.");
+        return;
+      }
+
       const vardas = document.getElementById("vardas").value || "Neįvestas";
       const zinute = document.getElementById("klausimai").value || "Be teksto";
 
       const message = `🧾 Nauja pasitikėjimo forma:%0A👤 Vardas: ${vardas}%0A💬 Žinutė: ${zinute}`;
       const url = `https://api.telegram.org/bot${token}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(message)}`;
 
-      const response = await fetch(url);
-      if (response.ok) {
+      const resp = await fetch(url);
+      if (resp.ok) {
         document.getElementById("confirmation").style.display = "block";
         document.getElementById("trustForm").reset();
+        grecaptcha.reset();
       } else {
         alert("❌ Klaida siunčiant žinutę į Telegram.");
       }
