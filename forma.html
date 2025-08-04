@@ -8,7 +8,7 @@
 </head>
 <body>
   <h1>✅ Pasitikėjimo Validacijos Forma</h1>
-  <form action="mailto:admin@safestack.tech" method="POST" enctype="text/plain">
+  <form id="trustForm">
     <label for="vardas">Vardas (neprivaloma):</label><br>
     <input type="text" id="vardas" name="vardas" style="width:100%"><br><br>
 
@@ -17,8 +17,33 @@
 
     <input type="submit" value="Siųsti" style="padding: 0.5rem 1rem;">
   </form>
+
+  <p id="confirmation" style="display:none; margin-top: 1rem; color:lightgreen;">✅ Žinutė išsiųsta į SafeStack Telegram.</p>
+
   <footer>
-    <p><small>Ši forma siunčia el. laišką į <a href="mailto:admin@safestack.tech">admin@safestack.tech</a></small></p>
+    <p><small>Ši forma siunčia žinutę į <a href="https://t.me/Safe_Stack" target="_blank">@Safe_Stack</a> Telegram kanalą.</small></p>
   </footer>
+
+  <script>
+    const token = "7981081263:AAFR047fkdCWirWcx_pgPcOmuytktQ4ZQNw";
+    const chatId = "2020481035";
+
+    document.getElementById("trustForm").addEventListener("submit", async function(e) {
+      e.preventDefault();
+      const vardas = document.getElementById("vardas").value || "Neįvestas";
+      const zinute = document.getElementById("klausimai").value || "Be teksto";
+
+      const message = `🧾 Nauja pasitikėjimo forma:%0A👤 Vardas: ${vardas}%0A💬 Žinutė: ${zinute}`;
+      const url = `https://api.telegram.org/bot${token}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(message)}`;
+
+      const response = await fetch(url);
+      if (response.ok) {
+        document.getElementById("confirmation").style.display = "block";
+        document.getElementById("trustForm").reset();
+      } else {
+        alert("❌ Klaida siunčiant žinutę į Telegram.");
+      }
+    });
+  </script>
 </body>
 </html>
